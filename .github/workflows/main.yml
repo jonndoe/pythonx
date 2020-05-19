@@ -58,6 +58,8 @@ jobs:
           docker push ${{ env.REDIS_IMAGE }}
           docker push ${{ env.ELASTIC_IMAGE }}
 
+
+
   deploy:
     name: Deploy to My cloud server
     runs-on: ubuntu-latest
