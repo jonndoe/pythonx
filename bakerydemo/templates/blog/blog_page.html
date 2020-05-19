@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load navigation_tags wagtailimages_tags comments comments_xtd %}
+
+{% block content %}
+
+    {% image self.image fill-1920x600 as hero_img %}
+        {% include "base/include/header-hero.html" %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                {% if page.introduction %}
+                    <p class="intro">{{ page.introduction }}</p>
+                {% endif %}
+
+                <div class="blog-meta">
+                    {% if page.authors %}
+                        <div class="blog-avatars">
+                            {% for author in page.authors %}
+                                <div class="author">{% image author.image fill-50x50-c100 class="blog-avatar" %}
+                                    {{ author.first_name }} {{ author.last_name }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    {% if page.date_published %}
+                        <div class="blog-byline">
+                            {{ page.date_published }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                {{ page.body }}
+
+                {% if page.get_tags %}
+                    Tagged with:<br />
+                    {% for tag in page.get_tags  %}
+                        <a href="{{ tag.url }}" class="btn btn-sm">{{ tag }}</a>
+                    {% endfor %}
+                {% endif %}
+
+                {% get_comment_count for page as comment_count %}
+                <div class="py-4 text-center">
+                  &nbsp;&sdot;&nbsp;
+                  {{ comment_count }} comment{{ comment_count|pluralize }}
+                  ha{{ comment_count|pluralize:"s,ve" }} been posted.
+                </div>
+
+                {% if comment_count %}
+                <ul class="media-list">
+                  {% render_xtdcomment_tree for page allow_flagging allow_feedback show_feedback %}
+                </ul>
+                {% endif %}
+
+                <div class="card card-block mb-5">
+                  <div class="card-body">
+                    <h4 class="card-title text-center pb-3">Post your comment</h4>
+                      {% if user.is_authenticated %}
+                        {% render_comment_form for page %}
+                      {% else %}
+                        <p>Please <a href="{% url 'account_login' %}">log in</a> to leave a comment.</p>
+                      {% endif %}
+                  </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock content %}

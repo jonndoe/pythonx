@@ -1,0 +1,132 @@
+
+
+
+name: Continuous Integration and Delivery
+
+on: [push]
+
+env:
+  WEB_IMAGE:     docker.pkg.github.com/$GITHUB_REPOSITORY/web2
+  NGINX_IMAGE:   docker.pkg.github.com/$GITHUB_REPOSITORY/nginx2
+  DB_IMAGE:      docker.pkg.github.com/$GITHUB_REPOSITORY/db2
+  ELASTIC_IMAGE: docker.pkg.github.com/$GITHUB_REPOSITORY/elastic2
+  REDIS_IMAGE:   docker.pkg.github.com/$GITHUB_REPOSITORY/redis2
+
+jobs:
+
+  build:
+    name: Build Docker Images
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v1
+      - name: Add environment variables to .env
+        run: |
+          echo DEBUG=0 >> .env
+          echo SQL_ENGINE=django.db.backends.postgresql >> .env
+          echo DATABASE=postgres >> .env
+          echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
+          #echo SQL_DATABASE=${{ secrets.SQL_DATABASE }} >> .env
+          #echo SQL_USER=${{ secrets.SQL_USER }} >> .env
+          #echo SQL_PASSWORD=${{ secrets.SQL_PASSWORD }} >> .env
+          #echo SQL_HOST=${{ secrets.SQL_HOST }} >> .env
+          #echo SQL_PORT=${{ secrets.SQL_PORT }} >> .env
+          echo DJANGO_ALLOWED_HOSTS=5.63.154.150 localhost 127.0.0.1 [::1] >> .env
+      - name: Set environment variables
+        run: |
+          echo ::set-env name=WEB_IMAGE::${{ env.WEB_IMAGE }}
+          echo ::set-env name=NGINX_IMAGE::${{ env.NGINX_IMAGE }}
+          echo ::set-env name=DB_IMAGE::${{ env.DB_IMAGE }}
+          echo ::set-env name=ELASTIC_IMAGE::${{ env.ELASTIC_IMAGE }}
+          echo ::set-env name=REDIS_IMAGE::${{ env.REDIS_IMAGE }}
+      - name: Log in to GitHub Packages
+        run: echo ${GITHUB_TOKEN} | docker login -u ${GITHUB_ACTOR} --password-stdin docker.pkg.github.com
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #- name: Pull images
+      #  run: |
+      #    docker pull ${{ env.WEB_IMAGE }} || true
+       #   docker pull ${{ env.NGINX_IMAGE }} || true
+       #   docker pull ${{ env.DB_IMAGE }} || true
+       #   docker pull ${{ env.REDIS_IMAGE }} || true
+       #   docker pull ${{ env.ELASTIC_IMAGE }} || true
+      - name: Build images
+        run: |
+          docker-compose -f docker-compose.ci.yml build
+      - name: Push images
+        run: |
+          docker push ${{ env.WEB_IMAGE }}
+          docker push ${{ env.NGINX_IMAGE }}
+          docker push ${{ env.DB_IMAGE }}
+          docker push ${{ env.REDIS_IMAGE }}
+          docker push ${{ env.ELASTIC_IMAGE }}
+
+  deploy:
+    name: Deploy to My cloud server
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v1
+      - name: Add environment variables to .env
+        run: |
+          echo DEBUG=0 >> .env
+          echo SQL_ENGINE=django.db.backends.postgresql >> .env
+          echo DATABASE=postgres >> .env
+          echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
+          #echo SQL_DATABASE=${{ secrets.SQL_DATABASE }} >> .env
+          #echo SQL_USER=${{ secrets.SQL_USER }} >> .env
+          #echo SQL_PASSWORD=${{ secrets.SQL_PASSWORD }} >> .env
+          #echo SQL_HOST=${{ secrets.SQL_HOST }} >> .env
+          #echo SQL_PORT=${{ secrets.SQL_PORT }} >> .env
+          echo WEB_IMAGE=${{ env.WEB_IMAGE }} >> .env
+          echo NGINX_IMAGE=${{ env.NGINX_IMAGE }} >> .env
+          echo DB_IMAGE=${{ env.DB_IMAGE }} >> .env
+          echo REDIS_IMAGE=${{ env.REDIS_IMAGE }} >> .env
+          echo ELASTIC_IMAGE=${{ env.ELASTIC_IMAGE }} >> .env
+          echo DJANGO_ALLOWED_HOSTS=www.pythonx.ru pythonx.ru 5.63.154.150 localhost 127.0.0.1 [::1] >> .env
+      - name: Add the private SSH key to the ssh-agent
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          mkdir -p ~/.ssh
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          ssh-add - <<< "${{ secrets.PRIVATE_KEY }}"
+      - name: Build and deploy images on AnyCloudServer
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          scp  -o StrictHostKeyChecking=no -r ./.env ./docker-compose.prod.traefik.ssl.yml root@${{ secrets.CLOUD_SERVER_IP_ADDRESS }}:/app
+          ssh -o StrictHostKeyChecking=no root@${{ secrets.CLOUD_SERVER_IP_ADDRESS }} << 'ENDSSH'
+          # stop all docker containers: docker stop $(docker ps -a -q)
+          #ssh -o StrictHostKeyChecking=no root@${{ secrets.CLOUD_SERVER_IP_ADDRESS }} docker stop $(docker ps -a -q)
+          #scp  -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r ./.env ./docker-compose.prod.yml root@${{ secrets.CLOUD_SERVER_IP_ADDRESS }}:/app
+          #ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@${{ secrets.CLOUD_SERVER_IP_ADDRESS }} << 'ENDSSH'
+            cd /app
+            source .env
+            docker login docker.pkg.github.com -u jonndoe -p ${{ secrets.API_TOKEN }}
+            docker pull $WEB_IMAGE
+            docker pull $NGINX_IMAGE
+            docker pull $DB_IMAGE
+            docker pull $REDIS_IMAGE
+            docker pull $ELASTIC_IMAGE
+            # stop all running containers on host if any
+            docker stop $(docker ps -a -q)
+            # clean system from old images, etc if any b4 deploy:
+            #yes | docker system prune --all
+            # remove static volume if any as we do not need old static files:
+            docker volume rm app_static-root
+            # now we have only volumes with needed data (media and database) on remote host,
+            # skip -d parameter to monitor containers activity through github actions
+            # docker-compose -f docker-compose.prod.yml up
+            docker-compose -f docker-compose.prod.traefik.ssl.yml up -d
+
+            # down and up the containers once more to ensure static files updated:
+            docker-compose -f docker-compose.prod.traefik.ssl.yml down
+            docker volume rm app_static-root
+            docker-compose -f docker-compose.prod.traefik.ssl.yml up --build -d
+
+            # clean system from unneeded dockerstuff and unused volumes:
+            yes | docker system prune --volumes
+          ENDSSH

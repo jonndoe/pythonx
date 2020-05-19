@@ -1,0 +1,84 @@
+# this file is used to start containers on remote server
+
+version: '2'
+
+services:
+  db:
+    environment:
+      POSTGRES_DB: app_db
+      POSTGRES_USER: app_user
+      POSTGRES_PASSWORD: changeme
+    image: "$DB_IMAGE"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    expose:
+      - "5432"
+  redis:
+    image: "$REDIS_IMAGE"
+    expose:
+      - "6379"
+  elasticsearch:
+    image: "$ELASTIC_IMAGE"
+    expose:
+      - "9200"
+  app:
+    image: "${WEB_IMAGE}"
+    environment:
+      DJANGO_ALLOWED_HOSTS: 5.63.154.150 localhost 127.0.0.1 [::1]
+      DJANGO_SECRET_KEY: changeme
+      DATABASE_URL: postgres://app_user:changeme@db/app_db
+      CACHE_URL: redis://redis
+      ELASTICSEARCH_ENDPOINT: elasticsearch
+    volumes:
+      - static-root:/code/bakerydemo/collect_static
+      - media-root:/code/bakerydemo/media
+    links:
+      - db:db
+      - redis:redis
+      - elasticsearch:elasticsearch
+    ports:
+      - "8001:8001"
+    depends_on:
+      - db
+      - redis
+      - elasticsearch
+
+  nginx:
+    volumes:
+      - media-root:/code/bakerydemo/media
+      - static-root:/code/bakerydemo/static
+    image: "${NGINX_IMAGE}"
+    depends_on:
+     - app
+    labels:
+      - "traefik.enable=true"
+      # we have only 5 attempts per week for requesting/updating certificates
+      # be carefull with that.
+      - "traefik.http.routers.nginx.rule=Host(`www.pythonx.ru`)"
+      - "traefik.http.routers.nginx.entrypoints=websecure"
+      - "traefik.http.routers.nginx.tls.certresolver=myresolver"
+
+  traefik:
+    image: "traefik:v2.0.1"
+    container_name: "traefik"
+    command:
+      - "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.myresolver.acme.email=qb89@yandex.ru"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - "/letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+volumes:
+  media-root:
+  static-root:
+  postgres_data:
