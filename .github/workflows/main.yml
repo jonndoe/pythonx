@@ -3,11 +3,11 @@ name: Continuous Integration and Delivery
 on: [push]
 
 env:
-  WEB_IMAGE:     docker.pkg.github.com/$GITHUB_REPOSITORY/web2
-  NGINX_IMAGE:   docker.pkg.github.com/$GITHUB_REPOSITORY/nginx2
-  DB_IMAGE:      docker.pkg.github.com/$GITHUB_REPOSITORY/db2
-  ELASTIC_IMAGE: docker.pkg.github.com/$GITHUB_REPOSITORY/elastic2
-  REDIS_IMAGE:   docker.pkg.github.com/$GITHUB_REPOSITORY/redis2
+  WEB_IMAGE:     docker.pkg.github.com/$GITHUB_REPOSITORY/web3
+  NGINX_IMAGE:   docker.pkg.github.com/$GITHUB_REPOSITORY/nginx3
+  DB_IMAGE:      docker.pkg.github.com/$GITHUB_REPOSITORY/db3
+  ELASTIC_IMAGE: docker.pkg.github.com/$GITHUB_REPOSITORY/elastic3
+  REDIS_IMAGE:   docker.pkg.github.com/$GITHUB_REPOSITORY/redis3
 
 jobs:
 
