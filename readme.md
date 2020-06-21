@@ -92,7 +92,7 @@ The following setting in `base.py` and `production.py` ensures that live email i
 In production on your own site, you'll need:
 
 - create yandex mail box for your domain
-- confirm yandex mail box https://webmaster.yandex.ru
+- confirm yandex mail box https://yandex.ru/support/webmaster/service/rights.html
 - add entries in your DNS record, and wait for it to update(yandex wiil return spam error if not yet updated)
 
   IN settings.py:
