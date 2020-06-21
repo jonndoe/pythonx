@@ -89,9 +89,34 @@ The following setting in `base.py` and `production.py` ensures that live email i
 
 `EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'`
 
-In production on your own site, you'll need to change this to:
+In production on your own site, you'll need:
+
+- create yandex mail box for your domain
+- confirm yandex mail box https://webmaster.yandex.ru
+- add entries in your DNS record, and wait for it to update(yandex wiil return spam error if not yet updated)
+
+  IN settings.py:
 
 `EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'`
 
+`EMAIL_HOST = 'smtp.yandex.ru'`
+
+`EMAIL_HOST_USER = 'domainmail@yandex.ru'`
+
+`EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')`
+
+`EMAIL_PORT = 587`
+
+`EMAIL_USE_TLS = True`
+
+`SERVER_EMAIL = EMAIL_HOST_USER`
+
+`DEFAULT_FROM_EMAIL = EMAIL_HOST_USER`
+
+
 and configure [SMTP settings](https://docs.djangoproject.com/en/1.10/topics/email/#smtp-backend) appropriate for your email provider.
+
+
+### Notes:
+
 
