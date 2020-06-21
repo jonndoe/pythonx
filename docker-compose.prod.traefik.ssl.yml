@@ -54,7 +54,7 @@ services:
       - "traefik.enable=true"
       # we have only 5 attempts per week for requesting/updating certificates
       # be carefull with that.
-      - "traefik.http.routers.nginx.rule=Host(`www.pythonx.ru`)"
+      - "traefik.http.routers.nginx.rule=Host(`www.pythonx.ru`,`pythonx.ru`)"
       - "traefik.http.routers.nginx.entrypoints=websecure"
       - "traefik.http.routers.nginx.tls=true"
       - "traefik.http.routers.nginx.tls.certresolver=myresolver"
