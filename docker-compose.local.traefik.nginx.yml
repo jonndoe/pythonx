@@ -12,6 +12,9 @@ services:
     image: postgres:9.6
     expose:
       - "5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
   redis:
     restart: always
     image: redis:3.0
@@ -32,6 +35,7 @@ services:
       context: .
       dockerfile: dockerfiles/docker_django_dev.conf
     volumes:
+      - ./:/code
       - static-root:/code/bakerydemo/collect_static
       - media-root:/code/bakerydemo/media
     links:
@@ -74,3 +78,4 @@ services:
 volumes:
   media-root:
   static-root:
+  postgres_data:

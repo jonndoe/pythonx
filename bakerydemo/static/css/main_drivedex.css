@@ -1132,3 +1132,8 @@ span.outline {
 .comment .content {
   font-weight: 300;
 }
+
+
+div.form-page form input {
+  background-color: #00b0b1;
+}
