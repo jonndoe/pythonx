@@ -46,7 +46,7 @@ services:
       ELASTICSEARCH_ENDPOINT: elasticsearch
     build:
       context: .
-      dockerfile: dockerfiles/Dockerfile.prod
+      dockerfile: dockerfiles/docker_django_prod.conf
      # cache_from:
         #- "${WEB_IMAGE}"
     image: "${WEB_IMAGE}"

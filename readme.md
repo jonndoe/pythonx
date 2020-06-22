@@ -118,5 +118,7 @@ and configure [SMTP settings](https://docs.djangoproject.com/en/1.10/topics/emai
 
 
 ### Notes:
+https://yandex.ru/support/mail/bounces/other.html
 
+https://postmaster.yandex.ru/
 

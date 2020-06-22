@@ -30,7 +30,7 @@ services:
       ELASTICSEARCH_ENDPOINT: elasticsearch
     build:
       context: .
-      dockerfile: dockerfiles/Dockerfile.prod
+      dockerfile: dockerfiles/docker_django_dev.conf
     volumes:
       - static-root:/code/bakerydemo/collect_static
       - media-root:/code/bakerydemo/media
