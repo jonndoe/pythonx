@@ -30,7 +30,8 @@ SECURE_SSL_REDIRECT = os.getenv('DJANGO_SECURE_SSL_REDIRECT', 'off') == 'on'
 ALLOWED_HOSTS =['www.pythonx.ru','pythonx.ru','5.63.154.150','localhost','127.0.0.1','[::1]',]
 
 # BASE_URL required for notification emails
-BASE_URL = 'http://localhost:8000'
+#BASE_URL = 'http://localhost:8000'
+BASE_URL = 'http://localhost:80'
 
 db_from_env = dj_database_url.config(conn_max_age=500)
 DATABASES['default'].update(db_from_env)
