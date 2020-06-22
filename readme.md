@@ -6,12 +6,18 @@ Pythonx NOTES app.
 
 This project is based on the amazing [Wagtail CMS](https://github.com/wagtail/wagtail).
 
-This project is set up to be test-deployed with github-Actions CI/CD 
+This project is set up to be test-deployed with github-Actions CI/CD.
 
-Run into docker containers: wagtail + uwsgi >> nginx >> postgres >> redis >> elasticsearch >> traefik+SSL
+docker containers: 
+- wagtail + uwsgi
+- nginx 
+- postgres 
+- redis 
+- elasticsearch 
+- traefik+SSL
 
 
-Setup with Docker
+RUN WITH DOCKER LOCALLY:
 -----------------
 
 #### Dependencies
@@ -19,14 +25,13 @@ Setup with Docker
 * [Docker Compose](https://docs.docker.com/compose/install/)
 
 ### Installation
-Run the following commands to test project locally with traefik and nginx:
+Run the following commands to run project locally with traefik and nginx:
 
 ```bash
-git clone https://github.com/wagtail/bakerydemo-docker-prod.git
-cd bakerydemo
-docker-compose -f docker-compose.local.traefik.nginx.yml up --build
-docker-compose run app /venv/bin/python manage.py load_initial_data
-docker-compose up
+git clone git@github.com:jonndoe/pythonx.git
+cd pythonx
+sudo docker-compose -f docker-compose.local.traefik.nginx.yml up --build
+sudo docker-compose -f docker-compose.local.traefik.nginx.yml exec app /venv/bin/python manage.py load_initial_data
 ```
 
 The demo site will now be accessible at [http://localhost:80/](http://localhost:80/) and the Wagtail admin
@@ -34,58 +39,53 @@ interface at [http://localhost:80/admin/](http://localhost:80/admin/).
 
 Log into the admin with the credentials ``admin / changeme``.
 
-**Important:** This `docker-compose.local.traefik.nginx.yml` is configured for local testing only, and is _not_ intended for production use.
+**Important:** The `bakerydemo/collect_static` folder will be created. 
+
+- Either You have to change permission to amemd css files for hot reload.
+
+- Or you have to edit css files in bakerydemo/static folder and then run 
+`sudo docker-compose -f docker-compose.local.traefik.nginx.yml exec app /venv/bin/python manage.py collectstatic`
+  to update the site.
 
 
-Setup with Virtualenv
----------------------
-You can run the Wagtail demo locally without setting up Vagrant or Docker and simply use Virtualenv, which is the [recommended installation approach](https://docs.djangoproject.com/en/1.10/topics/install/#install-the-django-code) for Django itself.
+
+RUN WITH DOCKER ON REMOTE HOST:
+-----------------
 
 #### Dependencies
-* Python 3.4, 3.5 or 3.6
-* [Virtualenv](https://virtualenv.pypa.io/en/stable/installation/)
-* [VirtualenvWrapper](https://virtualenvwrapper.readthedocs.io/en/latest/install.html) (optional)
+* [Docker](https://docs.docker.com/engine/installation/)
+* [Docker Compose](https://docs.docker.com/compose/install/)
 
 ### Installation
+Every time you make `git push origin master` from you local machine, githubCI/CD will build containers, and push them onto remote host.
+Settings include SSL certificates receiving.
+After successfull deploy you able to visit:
+- http://www.hostname.com
+- https://www.hostname.com
+- https://hostname.com
 
-With [PIP](https://github.com/pypa/pip) and [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/)
-installed, run:
+But you wont see site data, we need to load it:
 
-    mkvirtualenv wagtailbakerydemo
-    python --version
+- `ssh user@yourhostIPaddress`
 
-Confirm that this is showing a compatible version of Python 3.x. If not, and you have multiple versions of Python installed on your system, you may need to specify the appropriate version when creating the virtualenv:
+- `cd /app`
 
-    deactivate
-    rmvirtualenv wagtailbakerydemo
-    mkvirtualenv wagtailbakerydemo --python=python3.6
-    python --version
+- `sudo docker-compose -f docker-compose.local.traefik.nginx.yml exec app /venv/bin/python manage.py load_initial_data` 
 
-Now we're ready to set up the bakery demo project itself:
-
-    cd ~/dev [or your preferred dev directory]
-    git clone https://github.com/wagtail/bakerydemo.git
-    cd bakerydemo
-    pip install -r requirements/base.txt
-
-Next,  we'll set up our local environment variables. We use [django-dotenv](https://github.com/jpadilla/django-dotenv)
-to help with this. It reads environment variables located in a file name `.env` in the top level directory of the project. The only variable we need to start is `DJANGO_SETTINGS_MODULE`:
-
-    $ cp bakerydemo/settings/local.py.example bakerydemo/settings/local.py
-    $ echo "DJANGO_SETTINGS_MODULE=bakerydemo.settings.local" > .env
-
-To set up your database and load initial data, run the following commands:
-
-    ./manage.py migrate
-    ./manage.py load_initial_data
-    ./manage.py runserver
+The demo site will now be accessible at [https://youdomainname.com:80/](https://youdomainname.com:80/) and the Wagtail admin
+interface at [https://youdomainname.com:80/](https://youdomainname.com:80/).
 
 Log into the admin with the credentials ``admin / changeme``.
+
+**Important:** The important info to be here.
+
+
+
 
 
 ### Sending email from the contact form
 
-The following setting in `base.py` and `production.py` ensures that live email is not sent by the demo contact form.
+The following setting in `base.py` and `production.py` ensures that live email is not sent by the demo contact form:
 
 `EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'`
 

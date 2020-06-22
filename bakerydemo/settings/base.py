@@ -185,7 +185,7 @@ WAGTAILSEARCH_BACKENDS = {
 }
 
 # Wagtail settings
-WAGTAIL_SITE_NAME = "bakerydemo"
+WAGTAIL_SITE_NAME = "pythonx.ru"
 
 # Override AbstractImage
 WAGTAILIMAGES_IMAGE_MODEL = 'blog.CustomImage'
