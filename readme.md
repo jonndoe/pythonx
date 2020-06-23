@@ -70,7 +70,7 @@ But you wont see site data, we need to load it:
 
 - `cd /app`
 
-- `sudo docker-compose -f docker-compose.local.traefik.nginx.yml exec app /venv/bin/python manage.py load_initial_data` 
+- `sudo docker-compose -f docker-compose.prod.traefik.ssl.yml exec app /venv/bin/python manage.py load_initial_data` 
 
 The demo site will now be accessible at [https://youdomainname.com:80/](https://youdomainname.com:80/) and the Wagtail admin
 interface at [https://youdomainname.com:80/](https://youdomainname.com:80/).
