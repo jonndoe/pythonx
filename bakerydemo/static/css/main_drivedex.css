@@ -1137,3 +1137,10 @@ span.outline {
 .submit-input {
   background-color: #00b0b1;
 }
+
+form.w3-container fieldset {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    padding-bottom: 2px;
+}
