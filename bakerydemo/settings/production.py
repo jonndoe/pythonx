@@ -134,6 +134,7 @@ EMAIL_HOST = 'smtp-pulse.com'
 #EMAIL_HOST_USER = 'apikey'
 EMAIL_HOST_USER = 'qb89@yandex.ru'
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = 'registration@pythonx.ru'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 #SERVER_EMAIL = EMAIL_HOST_USER
