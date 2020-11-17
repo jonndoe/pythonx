@@ -9,6 +9,7 @@ This project is based on the amazing [Wagtail CMS](https://github.com/wagtail/wa
 This project is set up to be test-deployed with github-Actions CI/CD.
 
 docker containers: 
+
 - wagtail + uwsgi
 - nginx 
 - postgres 
