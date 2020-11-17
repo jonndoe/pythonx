@@ -29,6 +29,7 @@ services:
       DATABASE_URL: postgres://app_user:changeme@db/app_db
       CACHE_URL: redis://redis
       ELASTICSEARCH_ENDPOINT: elasticsearch
+      EMAIL_HOST_PASSWORD: "${EMAIL_HOST_PASSWORD}"
     # use this .env to start up containers if you stopped them on server
     # without this .env file enviroment variable will not be set
     #env_file:

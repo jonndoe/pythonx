@@ -44,7 +44,6 @@ services:
       DATABASE_URL: postgres://app_user:changeme@db/app_db
       CACHE_URL: redis://redis
       ELASTICSEARCH_ENDPOINT: elasticsearch
-      EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
     build:
       context: .
       dockerfile: dockerfiles/docker_django_prod.conf
