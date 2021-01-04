@@ -131,6 +131,10 @@ jobs:
             docker-compose -f docker-compose.prod.traefik.ssl.yml down
             docker volume rm app_static-root
             docker-compose -f docker-compose.prod.traefik.ssl.yml up --build -d
+            
+            #change permissions for /code directory to allow images uploading from the app.
+            #sudo docker container exec -it app_nginx_1 chmod 777 -R /code
+            docker container exec -it app_nginx_1 chmod 777 -R /code
 
             # clean system from unneeded dockerstuff and unused volumes:
             yes | docker system prune --volumes
