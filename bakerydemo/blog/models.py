@@ -56,7 +56,7 @@ class CustomImage(AbstractImage):
             Watermark_opacity(),
         ],
         format='JPEG',
-        options={'quality': 90},
+        #options={'quality': 90},
     )
 
     admin_form_fields = Image.admin_form_fields + (

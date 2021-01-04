@@ -137,6 +137,8 @@ jobs:
             #sudo docker container exec -it app_nginx_1 chmod 777 -R /code
             docker container exec -it app_nginx_1 chmod 777 -R /code
 
+
+
             # clean system from unneeded dockerstuff and unused volumes:
             yes | docker system prune --volumes
           ENDSSH
