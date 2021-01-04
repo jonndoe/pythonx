@@ -112,15 +112,15 @@ jobs:
             cd /app
             source .env
             docker login docker.pkg.github.com -u jonndoe -p ${{ secrets.API_TOKEN }}
+            # stop all running containers on host if any
+            docker stop $(docker ps -a -q)
+            # clean system from old images, etc if any b4 deploy:
+            yes | docker system prune --all
             docker pull $WEB_IMAGE
             docker pull $NGINX_IMAGE
             docker pull $DB_IMAGE
             docker pull $REDIS_IMAGE
             docker pull $ELASTIC_IMAGE
-            # stop all running containers on host if any
-            docker stop $(docker ps -a -q)
-            # clean system from old images, etc if any b4 deploy:
-            yes | docker system prune --all
             # remove static volume if any as we do not need old static files:
             docker volume rm app_static-root
             # now we have only volumes with needed data (media and database) on remote host,
