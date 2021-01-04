@@ -4,6 +4,7 @@
 Pythonx NOTES app.
 =======================
 
+
 This project is based on the amazing [Wagtail CMS](https://github.com/wagtail/wagtail).
 
 This project is set up to be test-deployed with github-Actions CI/CD.
