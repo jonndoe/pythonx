@@ -83,8 +83,8 @@ Log into the admin with the credentials ``admin / changeme``.
 
 **Important:** The important info to be here.
 
-
-
+####  Set nginx --> /code directory permissions to be able to load images!!! ####
+- `sudo docker container exec -it app_nginx_1 chmod 777 -R /code`
 
 
 ### Sending email from the contact form

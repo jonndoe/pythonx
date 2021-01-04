@@ -50,9 +50,9 @@ class CustomImage(AbstractImage):
         width_field='width',
         height_field='height',
         processors=[
-            ResizeToFit(1600, 500,
+            #ResizeToFit(1600, 500,
                         # upscale=False
-                        ),
+                        #),
             Watermark_opacity(),
         ],
         format='JPEG',
