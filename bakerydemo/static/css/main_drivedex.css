@@ -86,6 +86,18 @@ a.btn {
   text-transform: uppercase;
 }
 
+a.btn-light-green {
+  background-color: #69c6be;
+  color: white;
+  display: inline-block;
+  font-family: 'Lato', sans-serif;
+  font-size: 16px;
+  font-weight: 300;
+  letter-spacing: 0.15em;
+  padding: 15px 20px;
+  text-transform: uppercase;
+}
+
 a.btn:hover {
   background-color: #575454;
   color: white;
