@@ -194,7 +194,7 @@ class BreadsIndexPage(Page):
     # method on the model rather than within a view function
     def paginate(self, request, *args):
         page = request.GET.get('page')
-        paginator = Paginator(self.get_breads(), 12)
+        paginator = Paginator(self.get_breads(), 6)
         try:
             pages = paginator.page(page)
         except PageNotAnInteger:

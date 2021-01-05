@@ -209,7 +209,6 @@ class BlogIndexPage(RoutablePageMixin, Page):
         related_name='+',
         help_text='Landscape mode only; horizontal width between 1000px and 3000px.'
     )
-
     content_panels = Page.content_panels + [
         FieldPanel('introduction', classname="full"),
         ImageChooserPanel('image'),
@@ -218,19 +217,48 @@ class BlogIndexPage(RoutablePageMixin, Page):
     # Speficies that only BlogPage objects can live under this index page
     subpage_types = ['BlogPage']
 
+    # Returns the child BlogPage objects for this BlogPageIndex.
+    # If a tag is used then it will filter the posts by tag.
+    def get_posts(self, tag=None):
+        posts = BlogPage.objects.live().descendant_of(self).order_by('-date_published')
+        if tag:
+            posts = posts.filter(tags=tag)
+        return posts
+
     # Defines a method to access the children of the page (e.g. BlogPage
     # objects). On the demo site we use this on the HomePage
     def children(self):
         return self.get_children().specific().live()
+
+    # Pagination for the index page. We use the `django.core.paginator` as any
+    # standard Django app would, but the difference here being we have it as a
+    # method on the model rather than within a view function
+    def paginate(self, request, *args):
+        #unpack *args to get a tag name if any
+        if args:
+            for i in args:
+                tag = i
+        else:
+            tag = None
+        page = request.GET.get('page')
+        paginator = Paginator(self.get_posts(tag), 3)
+        try:
+            pages = paginator.page(page)
+        except PageNotAnInteger:
+            pages = paginator.page(1)
+        except EmptyPage:
+            pages = paginator.page(paginator.num_pages)
+        return pages
 
     # Overrides the context to list all child items, that are live, by the
     # date that they were published
     # http://docs.wagtail.io/en/latest/getting_started/tutorial.html#overriding-context
     def get_context(self, request):
         context = super(BlogIndexPage, self).get_context(request)
-        context['posts'] = BlogPage.objects.descendant_of(
-            self).live().order_by(
-            '-date_published')
+
+        # PostPage objects (get_posts) are passed through pagination
+        posts = self.paginate(request)
+        context['posts'] = posts
         return context
 
     # This defines a Custom view that utilizes Tags. This view will return all
@@ -249,24 +277,19 @@ class BlogIndexPage(RoutablePageMixin, Page):
                 messages.add_message(request, messages.INFO, msg)
             return redirect(self.url)
 
-        posts = self.get_posts(tag=tag)
+        # PostPage objects (get_posts) are passed through pagination
+        posts = self.paginate(request, tag)
+
         context = {
             'tag': tag,
             'posts': posts
         }
+
         return render(request, 'blog/blog_index_page.html', context)
 
     def serve_preview(self, request, mode_name):
         # Needed for previews to work
         return self.serve(request)
-
-    # Returns the child BlogPage objects for this BlogPageIndex.
-    # If a tag is used then it will filter the posts by tag.
-    def get_posts(self, tag=None):
-        posts = BlogPage.objects.live().descendant_of(self)
-        if tag:
-            posts = posts.filter(tags=tag)
-        return posts
 
     # Returns the list of Tags for all child posts of this BlogPage.
     def get_child_tags(self):
