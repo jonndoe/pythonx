@@ -86,8 +86,13 @@ Log into the admin with the credentials ``admin / changeme``.
 ####  Set nginx --> /code directory permissions to be able to load images!!! ####
 - `sudo docker container exec -it app_nginx_1 chmod 777 -R /code`
 
-### add new site in site settings with www.yousitename.com and port 80
+### DO THE FOLLOWING FOR CORRECT WORK:
+- add new site in site settings with `www.yousitename.com` and port `80`
+- set new site as default (tick)
+- delete previos site (`127.0.0.1` and port `8000`)
+
 otherwise comments will not work and other problems will arise
+such as `Internal server error` and problems with search bar.
 
 
 
