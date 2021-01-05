@@ -86,9 +86,8 @@ Log into the admin with the credentials ``admin / changeme``.
 ####  Set nginx --> /code directory permissions to be able to load images!!! ####
 - `sudo docker container exec -it app_nginx_1 chmod 777 -R /code`
 
-
-### change site settings in wagtail admin from 127.0.0.1 to www.yoursitename.com and port from 8000 to 80.
-otherwise comments will not work correctly
+### add new site in site settings with www.yousitename.com and port 80
+otherwise comments will not work and other problems will arise
 
 
 
