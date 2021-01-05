@@ -87,6 +87,11 @@ Log into the admin with the credentials ``admin / changeme``.
 - `sudo docker container exec -it app_nginx_1 chmod 777 -R /code`
 
 
+### change site settings in wagtail admin from 127.0.0.1 to www.yoursitename.com and port from 8000 to 80.
+otherwise comments will not work correctly
+
+
+
 ### Sending email from the contact form
 
 The following setting in `base.py` and `production.py` ensures that live email is not sent by the demo contact form:

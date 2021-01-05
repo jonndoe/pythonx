@@ -105,30 +105,37 @@ jobs:
         run: |
           scp  -o StrictHostKeyChecking=no -r ./.env ./docker-compose.prod.traefik.ssl.yml root@${{ secrets.CLOUD_SERVER_IP_ADDRESS }}:/app
           ssh -o StrictHostKeyChecking=no root@${{ secrets.CLOUD_SERVER_IP_ADDRESS }} << 'ENDSSH'
-          # stop all docker containers: docker stop $(docker ps -a -q)
+
+          # stop all docker containers
+          #docker stop $(docker ps -a -q)
           #ssh -o StrictHostKeyChecking=no root@${{ secrets.CLOUD_SERVER_IP_ADDRESS }} docker stop $(docker ps -a -q)
           #scp  -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r ./.env ./docker-compose.prod.yml root@${{ secrets.CLOUD_SERVER_IP_ADDRESS }}:/app
           #ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@${{ secrets.CLOUD_SERVER_IP_ADDRESS }} << 'ENDSSH'
+
             cd /app
             source .env
             docker login docker.pkg.github.com -u jonndoe -p ${{ secrets.API_TOKEN }}
+
             # stop all running containers on host if any
             docker stop $(docker ps -a -q)
-            # clean system from old images, etc if any b4 deploy:
+
+            # clean system from old images, etc if any b4 deploy
             yes | docker system prune --all
             docker pull $WEB_IMAGE
             docker pull $NGINX_IMAGE
             docker pull $DB_IMAGE
             docker pull $REDIS_IMAGE
             docker pull $ELASTIC_IMAGE
-            # remove static volume if any as we do not need old static files:
+
+            # remove static volume if any as we do not need old static files
             docker volume rm app_static-root
+
             # now we have only volumes with needed data (media and database) on remote host,
             # skip -d parameter to monitor containers activity through github actions
             # docker-compose -f docker-compose.prod.yml up
             docker-compose -f docker-compose.prod.traefik.ssl.yml up -d
 
-            # down and up the containers once more to ensure static files updated:
+            # down and up the containers once more to ensure static files updated
             docker-compose -f docker-compose.prod.traefik.ssl.yml down
             docker volume rm app_static-root
             docker-compose -f docker-compose.prod.traefik.ssl.yml up --build -d
@@ -137,8 +144,6 @@ jobs:
             #sudo docker container exec -it app_nginx_1 chmod 777 -R /code
             docker container exec -it app_nginx_1 chmod 777 -R /code
 
-
-
-            # clean system from unneeded dockerstuff and unused volumes:
+            # clean system from unneeded dockerstuff and unused volumes
             yes | docker system prune --volumes
           ENDSSH
