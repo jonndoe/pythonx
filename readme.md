@@ -38,8 +38,8 @@ sudo docker-compose -f docker-compose.local.traefik.nginx.yml up --build
 sudo docker-compose -f docker-compose.local.traefik.nginx.yml exec app /venv/bin/python manage.py load_initial_data
 ```
 
-The demo site will now be accessible at [http://localhost:80/](http://localhost:80/) and the Wagtail admin
-interface at [http://localhost:80/admin/](http://localhost:80/admin/).
+The demo site will now be accessible at [http://127.0.0.1:80/](http://localhost:80/) and the Wagtail admin
+interface at [http://127.0.0.1:80/admin/](http://localhost:80/admin/).
 
 Log into the admin with the credentials ``admin / changeme``.
 
@@ -88,8 +88,9 @@ Log into the admin with the credentials ``admin / changeme``.
 
 ### DO THE FOLLOWING FOR CORRECT WORK:
 - add new site in site settings with `www.yousitename.com` and port `80`
+- set old site as not default (untick it)
 - set new site as default (tick)
-- delete previos site (`127.0.0.1` and port `8000`)
+- delete old site (`127.0.0.1` and port `8000`)
 
 otherwise comments will not work and other problems will arise
 such as `Internal server error` and problems with search bar.

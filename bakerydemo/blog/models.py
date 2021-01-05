@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django.contrib import messages
 from django.db import models
 from django.shortcuts import redirect, render
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from modelcluster.contrib.taggit import ClusterTaggableManager
 from modelcluster.fields import ParentalKey
