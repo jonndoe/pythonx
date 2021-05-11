@@ -22,7 +22,7 @@ docker containers:
 
 RUN WITH DOCKER LOCALLY:
 
------------------
+------------------
 
 #### Dependencies
 * [Docker](https://docs.docker.com/engine/installation/)
